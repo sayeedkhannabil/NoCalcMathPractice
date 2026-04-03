@@ -1,0 +1,1998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>No-Calculator Math Trainer</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --panel-soft: #f8fafc;
+      --text: #152033;
+      --muted: #5f6c80;
+      --line: #d8e0eb;
+      --primary: #2357d8;
+      --primary-soft: #eaf0ff;
+      --success: #137333;
+      --success-soft: #e9f7ed;
+      --danger: #c62828;
+      --danger-soft: #fdecec;
+      --warning: #9a6700;
+      --warning-soft: #fff6db;
+      --shadow: 0 20px 50px rgba(21, 32, 51, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #eef3fb 0%, #f7f9fc 100%);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #13264f 0%, #204081 58%, #2f61cc 100%);
+      color: white;
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -120px -120px auto;
+      width: 320px;
+      height: 320px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      filter: blur(8px);
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.05;
+    }
+
+    .hero p {
+      max-width: 760px;
+      margin: 0;
+      color: rgba(255,255,255,0.9);
+      line-height: 1.6;
+      font-size: 1rem;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      font-size: 0.92rem;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 22px 0;
+    }
+
+    .nav button,
+    .button,
+    button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 14px;
+      transition: 0.18s ease;
+      font: inherit;
+    }
+
+    .nav button {
+      background: white;
+      color: var(--text);
+      padding: 12px 16px;
+      box-shadow: 0 8px 24px rgba(21, 32, 51, 0.05);
+      border: 1px solid rgba(26, 45, 73, 0.06);
+      font-weight: 600;
+    }
+
+    .nav button.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid-2 {
+      grid-template-columns: 1.25fr 0.95fr;
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .card {
+      background: var(--panel);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(21, 32, 51, 0.06);
+    }
+
+    .card h2, .card h3 {
+      margin-top: 0;
+    }
+
+    .muted {
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .stat {
+      background: var(--panel-soft);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .stat .label {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-bottom: 8px;
+    }
+
+    .stat .value {
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    .suite-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .suite {
+      border: 1px solid var(--line);
+      background: var(--panel-soft);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .suite strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 1.02rem;
+    }
+
+    .suite p {
+      color: var(--muted);
+      margin: 0 0 14px;
+      line-height: 1.55;
+      min-height: 70px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      font-weight: 700;
+    }
+
+    .button.primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.secondary {
+      background: white;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .button.success {
+      background: var(--success);
+      color: white;
+    }
+
+    .button.warning {
+      background: #875f00;
+      color: white;
+    }
+
+    .button.ghost {
+      background: transparent;
+      color: var(--primary);
+      border: 1px solid rgba(35, 87, 216, 0.18);
+    }
+
+    .button:hover,
+    .nav button:hover,
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.01);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.92rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    select,
+    input[type="number"] {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--text);
+      font: inherit;
+    }
+
+    .checkbox-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .hidden { display: none !important; }
+
+    .session-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .mode-badge {
+      background: var(--primary-soft);
+      color: var(--primary);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+
+    .timer {
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: var(--text);
+    }
+
+    .progress-shell {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: #e8eef8;
+      overflow: hidden;
+      margin: 14px 0 20px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #2959d9 0%, #4a86ff 100%);
+      transition: width 0.25s ease;
+    }
+
+    .question-meta {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .meta-chip {
+      background: var(--panel-soft);
+      border: 1px solid var(--line);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .question-stem {
+      font-size: 1.2rem;
+      font-weight: 700;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    .options {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .option {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .option:hover {
+      border-color: rgba(35, 87, 216, 0.4);
+      background: #f9fbff;
+    }
+
+    .option.selected {
+      border-color: var(--primary);
+      background: #eef4ff;
+    }
+
+    .option.correct {
+      border-color: rgba(19, 115, 51, 0.35);
+      background: var(--success-soft);
+    }
+
+    .option.wrong {
+      border-color: rgba(198, 40, 40, 0.35);
+      background: var(--danger-soft);
+    }
+
+    .option-letter {
+      flex: 0 0 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--panel-soft);
+      border: 1px solid var(--line);
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .mentor-box {
+      background: linear-gradient(180deg, #fbfdff 0%, #f3f8ff 100%);
+      border: 1px solid #dbe6ff;
+      border-radius: 18px;
+      padding: 18px;
+      margin-top: 12px;
+    }
+
+    .mentor-title {
+      font-weight: 800;
+      color: #193774;
+      margin-bottom: 10px;
+    }
+
+    .mentor-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .session-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .result-banner {
+      padding: 16px 18px;
+      border-radius: 18px;
+      margin-bottom: 18px;
+      font-weight: 700;
+    }
+
+    .result-banner.success {
+      background: var(--success-soft);
+      color: var(--success);
+      border: 1px solid rgba(19, 115, 51, 0.2);
+    }
+
+    .result-banner.warning {
+      background: var(--warning-soft);
+      color: var(--warning);
+      border: 1px solid rgba(154, 103, 0, 0.2);
+    }
+
+    .review-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .review-item {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      background: var(--panel-soft);
+    }
+
+    .review-item.good {
+      border-color: rgba(19, 115, 51, 0.18);
+    }
+
+    .review-item.bad {
+      border-color: rgba(198, 40, 40, 0.18);
+    }
+
+    .review-item strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .topic-bars {
+      display: grid;
+      gap: 14px;
+    }
+
+    .topic-row {
+      display: grid;
+      grid-template-columns: 160px 1fr 80px;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .bar-shell {
+      height: 12px;
+      background: #e7edf8;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #2959d9 0%, #4a86ff 100%);
+    }
+
+    .tips {
+      display: grid;
+      gap: 12px;
+    }
+
+    .tip {
+      padding: 16px;
+      border-radius: 16px;
+      background: var(--panel-soft);
+      border: 1px solid var(--line);
+    }
+
+    .tip strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .footer-note {
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.65;
+    }
+
+    .empty-state {
+      padding: 18px;
+      background: var(--panel-soft);
+      border-radius: 16px;
+      border: 1px dashed var(--line);
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    @media (max-width: 980px) {
+      .grid-2,
+      .grid-3,
+      .stats,
+      .suite-list,
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topic-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <h1>No-Calculator Math Trainer</h1>
+      <p>
+        A simple but serious practice site for quantitative aptitude. It drills mental math,
+        pattern recognition, timing, and exam composure. When a mistake happens, the site explains
+        the shortest path, the full method, and the trap to avoid next time.
+      </p>
+      <div class="pill-row">
+        <div class="pill">Topic Drills</div>
+        <div class="pill">Speed Sprint</div>
+        <div class="pill">Mini Mock</div>
+        <div class="pill">Full Mock</div>
+        <div class="pill">Weak Area Recovery</div>
+        <div class="pill">Mentor Feedback</div>
+      </div>
+    </section>
+
+    <div class="nav" id="nav"></div>
+
+    <main>
+      <section id="dashboardView" class="view grid grid-2"></section>
+      <section id="practiceView" class="view hidden"></section>
+      <section id="sessionView" class="view hidden"></section>
+      <section id="resultsView" class="view hidden"></section>
+      <section id="weakView" class="view hidden"></section>
+      <section id="cheatView" class="view hidden"></section>
+    </main>
+  </div>
+
+  <script>
+    const questionBank = [
+      {
+        id: 1,
+        topic: "Trigonometry",
+        difficulty: 2,
+        stem: "If sin θ × cos(90° − θ) = 1/2 and θ is acute, what is θ?",
+        options: ["30°", "45°", "60°", "90°"],
+        answer: 1,
+        hint: "Use the identity cos(90° − θ) = sin θ.",
+        fastPath: "sin θ × cos(90° − θ) becomes sin²θ. So sin²θ = 1/2, meaning sin θ = 1/√2 for an acute angle. That gives θ = 45°.",
+        explanation: "Since cos(90° − θ) = sin θ, the left side becomes sin²θ. So sin²θ = 1/2. For an acute angle, sin θ is positive, so sin θ = 1/√2. Therefore θ = 45°.",
+        trap: "A common trap is to forget the co-function identity and treat the two trig terms as unrelated."
+      },
+      {
+        id: 2,
+        topic: "Arithmetic",
+        difficulty: 2,
+        stem: "A square's side length increases by 25%. By what percent does its area increase?",
+        options: ["25%", "50%", "56.25%", "62.5%"],
+        answer: 2,
+        hint: "Area changes with the square of the side scale factor.",
+        fastPath: "New side factor = 1.25. New area factor = 1.25² = 1.5625. So the area rises by 56.25%.",
+        explanation: "If the original side is s, the new side is 1.25s. The new area becomes (1.25s)² = 1.5625s². That means the area is 56.25% more than before.",
+        trap: "Many students say 25% because they forget that area depends on two dimensions, not one."
+      },
+      {
+        id: 3,
+        topic: "Arithmetic",
+        difficulty: 2,
+        stem: "A rectangle was originally 100 cm by 50 cm. If the length increases by 20% and the width decreases by 10%, what are the new dimensions?",
+        options: ["120 cm by 45 cm", "110 cm by 45 cm", "120 cm by 40 cm", "130 cm by 35 cm"],
+        answer: 0,
+        hint: "Increase and decrease each dimension separately.",
+        fastPath: "20% of 100 is 20, so length becomes 120. 10% of 50 is 5, so width becomes 45.",
+        explanation: "The length becomes 100 × 1.20 = 120 cm. The width becomes 50 × 0.90 = 45 cm. So the new dimensions are 120 cm by 45 cm.",
+        trap: "Do not apply the 20% and 10% changes to the same dimension by mistake."
+      },
+      {
+        id: 4,
+        topic: "Geometry",
+        difficulty: 3,
+        stem: "For a sphere of radius 10 cm, the surface area is what percent of the volume?",
+        options: ["24%", "30%", "40%", "45%"],
+        answer: 1,
+        hint: "Compute surface area and volume, then form SA ÷ V × 100.",
+        fastPath: "Surface area = 4πr² = 400π. Volume = 4/3 πr³ = 4000/3 π. Their ratio is 400π ÷ (4000/3 π) = 3/10 = 30%.",
+        explanation: "Use the formulas: surface area = 4πr² and volume = 4/3 πr³. With r = 10, SA = 400π and V = 4000/3 π. So SA/V = 3/10 = 30%.",
+        trap: "A common mistake is cancelling the radius incorrectly and getting 10% or 40%."
+      },
+      {
+        id: 5,
+        topic: "Counting",
+        difficulty: 4,
+        stem: "How many different circular seating arrangements are possible for 23 people around a round table?",
+        options: ["23!", "22!", "21!", "23"],
+        answer: 1,
+        hint: "For circular arrangements, one position is fixed.",
+        fastPath: "For n people around a round table, arrangements = (n − 1)!. So the answer is 22!.",
+        explanation: "In a circle, rotations are considered the same. So instead of 23!, the number of distinct arrangements is (23 − 1)! = 22!.",
+        trap: "Using 23! is the classic mistake. That would be correct only in a line."
+      },
+      {
+        id: 6,
+        topic: "Algebra",
+        difficulty: 1,
+        stem: "What is the slope of the line 6x + 2y = 8?",
+        options: ["3", "1/2", "-3", "-1/3"],
+        answer: 2,
+        hint: "Rewrite in the form y = mx + c.",
+        fastPath: "2y = -6x + 8, so y = -3x + 4. The slope is -3.",
+        explanation: "Move 6x to the other side: 2y = -6x + 8. Divide by 2 and get y = -3x + 4. The slope is the coefficient of x, so the slope is -3.",
+        trap: "Do not forget the sign change when moving 6x to the other side."
+      },
+      {
+        id: 7,
+        topic: "Algebra",
+        difficulty: 1,
+        stem: "A number line shows a closed dot at 5 and shading to the right. Which inequality matches it?",
+        options: ["x > 5", "x < 5", "x ≥ 5", "x ≤ 5"],
+        answer: 2,
+        hint: "A closed dot means the endpoint is included.",
+        fastPath: "Closed dot means include 5. Rightward shading means larger values. So x ≥ 5.",
+        explanation: "Because the point at 5 is filled in, 5 is included. The arrow goes to the right, which means values greater than 5. Therefore x ≥ 5.",
+        trap: "Open dot and closed dot matter. If the dot were open, then it would be x > 5."
+      },
+      {
+        id: 8,
+        topic: "Algebra",
+        difficulty: 2,
+        stem: "If 18 : x = x : 8, what is x?",
+        options: ["8", "10", "12", "18"],
+        answer: 2,
+        hint: "Use cross multiplication.",
+        fastPath: "x² = 18 × 8 = 144, so x = 12.",
+        explanation: "From 18/x = x/8, cross multiply to get x² = 144. Since the ratio value is positive here, x = 12.",
+        trap: "Some students divide instead of multiplying the means and extremes."
+      },
+      {
+        id: 9,
+        topic: "Number Sense",
+        difficulty: 2,
+        stem: "M is the sum of two consecutive even numbers and N is the sum of two consecutive odd numbers. What kind of number is M + N?",
+        options: ["Even", "Odd", "Prime", "Cannot be determined"],
+        answer: 0,
+        hint: "Even + even stays even.",
+        fastPath: "Two consecutive even numbers add to an even number. Two consecutive odd numbers also add to an even number. Even + even = even.",
+        explanation: "Let the consecutive even numbers be 2k and 2k + 2. Their sum is 4k + 2, which is even. Let the odd numbers be 2m + 1 and 2m + 3. Their sum is 4m + 4, also even. So M + N is even.",
+        trap: "Prime is tempting because small examples can mislead you, but parity decides this immediately."
+      },
+      {
+        id: 10,
+        topic: "Arithmetic",
+        difficulty: 2,
+        stem: "Kulsum and Ayesha share money in the ratio 4 : 1. If Ayesha gets 2400 taka, what is the total amount shared?",
+        options: ["3200", "4800", "9600", "12000"],
+        answer: 3,
+        hint: "Ayesha represents 1 part out of 5 total parts.",
+        fastPath: "If 1 part is 2400, then 5 parts are 12000.",
+        explanation: "The ratio 4 : 1 means 5 equal parts in total. Ayesha's share is the 1-part portion. So the total is 2400 × 5 = 12000 taka.",
+        trap: "Do not multiply by 4. That gives Kulsum's share, not the total."
+      },
+      {
+        id: 11,
+        topic: "Ratio",
+        difficulty: 3,
+        stem: "Materials, labor, and overhead are shared in the ratio 3 : 4 : 1. If materials cost 67.5 tk, what is the total cost?",
+        options: ["135 tk", "180 tk", "225 tk", "270 tk"],
+        answer: 1,
+        hint: "3 parts correspond to 67.5 tk.",
+        fastPath: "1 part = 67.5 ÷ 3 = 22.5. Total parts = 8. So total cost = 8 × 22.5 = 180.",
+        explanation: "Since the ratio totals 3 + 4 + 1 = 8 parts, first find one part: 67.5 ÷ 3 = 22.5. Then multiply by 8. The total cost is 180 tk.",
+        trap: "Many students add 67.5 directly to the ratio numbers, which is not how proportional splitting works."
+      },
+      {
+        id: 12,
+        topic: "Time-Speed-Distance",
+        difficulty: 3,
+        stem: "Stations X and Y are 500 km apart. One train leaves X at 20 km/h and another leaves Y at 30 km/h toward X. How far from X do they meet?",
+        options: ["120 km", "200 km", "300 km", "400 km"],
+        answer: 1,
+        hint: "Use relative speed to find time.",
+        fastPath: "Relative speed = 20 + 30 = 50 km/h. Time to meet = 500 ÷ 50 = 10 h. Distance from X = 20 × 10 = 200 km.",
+        explanation: "Because they move toward each other, add the speeds. They meet after 10 hours. In that time, the train from X travels 20 × 10 = 200 km, so the meeting point is 200 km from X.",
+        trap: "Using the speed difference is wrong because the trains are moving toward each other, not in the same direction."
+      },
+      {
+        id: 13,
+        topic: "Geometry",
+        difficulty: 4,
+        stem: "In a circle, O is the center and OP is perpendicular to chord MN. If ON = 7 and PN = 3, what is OP?",
+        options: ["√10", "2√10", "4√6", "6"],
+        answer: 1,
+        hint: "A perpendicular from the center to a chord creates a right triangle.",
+        fastPath: "Use ON² = OP² + PN². So 7² = OP² + 3². That gives OP² = 40, so OP = 2√10.",
+        explanation: "Since OP is perpendicular to the chord, triangle OPN is right-angled. Apply Pythagoras: OP² = ON² − PN² = 49 − 9 = 40. Therefore OP = 2√10.",
+        trap: "Do not add 7 and 3. The radius and half-chord are legs of a right-triangle relationship."
+      },
+      {
+        id: 14,
+        topic: "Work-Time",
+        difficulty: 2,
+        stem: "If 3 men can repair a road in 8 hours, how many men are needed to finish the same work in 4 hours?",
+        options: ["3", "5", "6", "9"],
+        answer: 2,
+        hint: "Work stays constant, so men × time stays constant.",
+        fastPath: "3 × 8 = 24 man-hours. For 4 hours, men needed = 24 ÷ 4 = 6.",
+        explanation: "The job requires 24 man-hours. If the time is cut to 4 hours, you need 24 ÷ 4 = 6 men.",
+        trap: "This is inverse proportion, not direct proportion."
+      },
+      {
+        id: 15,
+        topic: "Complex Numbers",
+        difficulty: 1,
+        stem: "What is √(-47)?",
+        options: ["-√47", "i√47", "-47i", "i²"],
+        answer: 1,
+        hint: "√(-a) = i√a for positive a.",
+        fastPath: "√(-47) = √47 × √(-1) = i√47.",
+        explanation: "The square root of a negative number brings out i. So √(-47) = i√47.",
+        trap: "-√47 is wrong because squaring it gives +47, not -47."
+      },
+      {
+        id: 16,
+        topic: "Geometry",
+        difficulty: 2,
+        stem: "What is the center of the circle x² + y² − 16x + y + k = 0?",
+        options: ["(8, -1/2)", "(8, 1/2)", "(-8, -1/2)", "(-8, 1/2)"],
+        answer: 0,
+        hint: "Compare with x² + y² + Dx + Ey + F = 0, whose center is (-D/2, -E/2).",
+        fastPath: "D = -16 and E = 1, so center = (8, -1/2).",
+        explanation: "In x² + y² + Dx + Ey + F = 0, the center is (-D/2, -E/2). Here D = -16 and E = 1. So the center is (8, -1/2).",
+        trap: "Students often forget the minus sign in the center formula."
+      },
+      {
+        id: 17,
+        topic: "Trigonometry",
+        difficulty: 3,
+        stem: "If tan A = 1/√2 and tan B = √2, what is A + B if both angles are acute?",
+        options: ["0°", "30°", "60°", "90°"],
+        answer: 3,
+        hint: "Use the tan(A + B) formula.",
+        fastPath: "tan A × tan B = 1, so tan(A + B) becomes undefined because the denominator 1 − tanA tanB = 0. That means A + B = 90°.",
+        explanation: "Apply tan(A + B) = (tan A + tan B)/(1 − tan A tan B). Since tan A tan B = (1/√2)(√2) = 1, the denominator becomes 0. Therefore A + B = 90°.",
+        trap: "The sum is not found by adding the tangent values directly."
+      },
+      {
+        id: 18,
+        topic: "Counting",
+        difficulty: 1,
+        stem: "How many possible outcomes are there when three dice are rolled at the same time?",
+        options: ["18", "36", "81", "216"],
+        answer: 3,
+        hint: "Each die has 6 outcomes.",
+        fastPath: "6 × 6 × 6 = 216.",
+        explanation: "Each of the three dice can land in 6 ways, and the choices are independent. So the total number of outcomes is 6³ = 216.",
+        trap: "Do not add 6 + 6 + 6. These are combined events, so you multiply."
+      },
+      {
+        id: 19,
+        topic: "Number Sense",
+        difficulty: 1,
+        stem: "What fraction is equal to the repeating decimal 0.333...?",
+        options: ["3/10", "1/3", "33/100", "1/30"],
+        answer: 1,
+        hint: "0.333... is the classic one-third decimal.",
+        fastPath: "0.333... = 1/3.",
+        explanation: "The repeating decimal 0.333... is exactly equal to 1/3, not an approximation.",
+        trap: "0.3 and 0.33 are terminating decimals, so they are not equal to 0.333..."
+      },
+      {
+        id: 20,
+        topic: "Algebra",
+        difficulty: 2,
+        stem: "If the determinant of the matrix [[3, 2], [x, 14]] is 0, what is x?",
+        options: ["-12", "14", "21", "24"],
+        answer: 2,
+        hint: "For a 2×2 matrix [[a, b], [c, d]], determinant = ad − bc.",
+        fastPath: "3 × 14 − 2x = 0 → 42 − 2x = 0 → x = 21.",
+        explanation: "Set the determinant equal to zero: 3·14 − 2x = 0. This gives 42 − 2x = 0, so 2x = 42 and x = 21.",
+        trap: "Some students multiply the wrong diagonal or forget the subtraction."
+      },
+      {
+        id: 21,
+        topic: "Geometry",
+        difficulty: 3,
+        stem: "A right triangle has altitude 7 cm less than its base and hypotenuse 13 cm. What are the other two sides?",
+        options: ["10 cm and 5 cm", "12 cm and 5 cm", "12 cm and 10 cm", "14 cm and 10 cm"],
+        answer: 1,
+        hint: "Set the base to x and the altitude to x − 7.",
+        fastPath: "Try the 5-12-13 Pythagorean triple. Since the altitude is 7 less than the base, the sides are 12 and 5.",
+        explanation: "Let the base be x and the altitude be x − 7. Then x² + (x − 7)² = 13². Solving gives x = 12, so the altitude is 5. Therefore the two sides are 12 cm and 5 cm.",
+        trap: "Do not guess 10 and 5. Those do not make a 13 hypotenuse."
+      },
+      {
+        id: 22,
+        topic: "Quadratics",
+        difficulty: 2,
+        stem: "What can you say about the roots of 2x² + x + 4 = 0?",
+        options: ["One positive and one negative", "Both positive", "Both negative", "No real roots"],
+        answer: 3,
+        hint: "Check the discriminant b² − 4ac.",
+        fastPath: "Discriminant = 1 − 32 = -31, which is negative. So the equation has no real roots.",
+        explanation: "For ax² + bx + c = 0, the discriminant is b² − 4ac. Here that is 1² − 4·2·4 = 1 − 32 = -31. A negative discriminant means the roots are not real.",
+        trap: "Do not try to guess the signs of the roots before checking whether the roots are even real."
+      },
+      {
+        id: 23,
+        topic: "Radicals",
+        difficulty: 3,
+        stem: "Find the value of √(6 + √(6 + √(6 + ... ))).",
+        options: ["2", "3", "3.5", "4"],
+        answer: 1,
+        hint: "Let the whole expression be x and square both sides.",
+        fastPath: "If x = √(6 + x), then x² = 6 + x. So x² − x − 6 = 0. The positive root is 3.",
+        explanation: "Let x = √(6 + √(6 + ... )). Then x = √(6 + x). Squaring gives x² = 6 + x, so x² − x − 6 = 0. Factor: (x − 3)(x + 2) = 0. Since x is positive, x = 3.",
+        trap: "Use only the positive root because the original expression is a square root."
+      },
+      {
+        id: 24,
+        topic: "Logarithms",
+        difficulty: 2,
+        stem: "If log10(7) = a, what is log10(1/70)?",
+        options: ["-(a + 1)", "-(a - 1)", "a/10", "1/(10a)"],
+        answer: 0,
+        hint: "Break 1/70 into 1 ÷ (7×10).",
+        fastPath: "log(1/70) = -log(70) = -(log 7 + log 10) = -(a + 1).",
+        explanation: "Use the laws of logarithms: log(1/70) = log 1 − log 70 = 0 − [log 7 + log 10] = -(a + 1).",
+        trap: "The minus sign applies to the whole sum, not just to a."
+      },
+      {
+        id: 25,
+        topic: "Quadratics",
+        difficulty: 1,
+        stem: "If the discriminant D of a quadratic equation is greater than 0, what does that mean?",
+        options: ["Two real and equal roots", "Two real and unequal roots", "Imaginary roots", "No roots"],
+        answer: 1,
+        hint: "Review the standard discriminant cases.",
+        fastPath: "D > 0 means two real, distinct roots.",
+        explanation: "For a quadratic, D > 0 gives two real and unequal roots. D = 0 gives equal real roots. D < 0 gives non-real roots.",
+        trap: "Do not mix up D > 0 and D = 0."
+      },
+      {
+        id: 26,
+        topic: "Counting",
+        difficulty: 1,
+        stem: "If you have 3 T-shirts and 5 pairs of jeans, how many different outfits can you make by choosing one T-shirt and one pair of jeans?",
+        options: ["5", "8", "10", "15"],
+        answer: 3,
+        hint: "Use the multiplication principle.",
+        fastPath: "3 choices × 5 choices = 15 outfits.",
+        explanation: "For each of the 3 T-shirts, there are 5 possible jeans choices. So the total is 3 × 5 = 15.",
+        trap: "Do not add 3 and 5. This is one choice from each category, so multiply."
+      },
+      {
+        id: 27,
+        topic: "Functions",
+        difficulty: 2,
+        stem: "Given f(x) = 3x² + 2x − 1 and g(x) = x + 1, what is (f ∘ g)(−1)?",
+        options: ["-5", "-3", "-1", "1"],
+        answer: 2,
+        hint: "First find g(-1), then apply f.",
+        fastPath: "g(-1) = 0. Then f(0) = -1.",
+        explanation: "Composition means f(g(-1)). Since g(-1) = -1 + 1 = 0, we evaluate f(0). That gives 3·0² + 2·0 − 1 = -1.",
+        trap: "Students often apply f first, which is the wrong order."
+      },
+      {
+        id: 28,
+        topic: "Functions",
+        difficulty: 2,
+        stem: "Given f(x) = x³ − x + 1 and g(x) = x² + 2x + 1, what is (g ∘ f)(0)?",
+        options: ["1", "2", "3", "4"],
+        answer: 3,
+        hint: "First find f(0), then substitute into g.",
+        fastPath: "f(0) = 1. Then g(1) = 1 + 2 + 1 = 4.",
+        explanation: "Compute f(0) first: 0³ − 0 + 1 = 1. Then apply g to that result: g(1) = 1² + 2(1) + 1 = 4.",
+        trap: "Composition order matters. Read it from inside out."
+      },
+      {
+        id: 29,
+        topic: "Sets",
+        difficulty: 2,
+        stem: "Let B = {x : x is an even natural number less than 6} and A = {x : x is a natural number and also a factor of 36}. What is A ∩ B?",
+        options: ["{2, 3, 4, 6}", "{2, 4}", "{}", "{2, 3}"],
+        answer: 1,
+        hint: "List the elements of B first.",
+        fastPath: "B = {2, 4}. Both 2 and 4 are factors of 36, so A ∩ B = {2, 4}.",
+        explanation: "The even natural numbers less than 6 are 2 and 4. Both divide 36 exactly, so both belong to A as well. Therefore the intersection is {2, 4}.",
+        trap: "Do not include 6, because the phrase says less than 6, not less than or equal to 6."
+      },
+      {
+        id: 30,
+        topic: "Complex Numbers",
+        difficulty: 2,
+        stem: "If z = -2 + 5i, what is z² + 4z + 30?",
+        options: ["0", "1", "√2", "i"],
+        answer: 1,
+        hint: "Expand z² first, then add 4z and 30.",
+        fastPath: "z² = (-2 + 5i)² = -21 - 20i. Also 4z = -8 + 20i. Add 30. The imaginary parts cancel, leaving 1.",
+        explanation: "Compute z²: (-2 + 5i)² = 4 - 20i + 25i² = 4 - 20i - 25 = -21 - 20i. Then add 4z = -8 + 20i and 30. The result is (-21 - 20i) + (-8 + 20i) + 30 = 1.",
+        trap: "Do not forget that i² = -1."
+      },
+      {
+        id: 31,
+        topic: "Algebra",
+        difficulty: 2,
+        stem: "Given 4x + 3y = 15 and 2x − 6y = 20, which relation is true?",
+        options: ["x > y", "x < y", "x = y", "x ≤ y"],
+        answer: 0,
+        hint: "Solve quickly by expressing x from the second equation.",
+        fastPath: "From 2x − 6y = 20, x = 10 + 3y. Substitute into the first equation and get y = -5/3, x = 5. So x > y.",
+        explanation: "From the second equation, x = 10 + 3y. Put that into the first equation: 4(10 + 3y) + 3y = 15. So 40 + 15y = 15, giving y = -5/3. Then x = 5. Since 5 is greater than -5/3, x > y.",
+        trap: "The relation is easier than the full solution looks. Once one variable is positive and the other is negative, you are done."
+      },
+      {
+        id: 32,
+        topic: "Trigonometry",
+        difficulty: 1,
+        stem: "Convert 3π/10 radians to degrees.",
+        options: ["36°", "54°", "81°", "100°"],
+        answer: 1,
+        hint: "Multiply by 180/π.",
+        fastPath: "(3π/10) × (180/π) = 54°.",
+        explanation: "Radians to degrees means multiply by 180/π. So 3π/10 becomes 3×180/10 = 54°.",
+        trap: "Do not multiply by π again. It cancels."
+      },
+      {
+        id: 33,
+        topic: "Number Sense",
+        difficulty: 2,
+        stem: "If P is the sum of the first 100 natural numbers, which of the following definitely divides P?",
+        options: ["2", "4", "8", "9"],
+        answer: 0,
+        hint: "Use the formula n(n+1)/2.",
+        fastPath: "P = 100×101/2 = 5050. It is divisible by 2, but not by 4, 8, or 9.",
+        explanation: "The sum of the first 100 natural numbers is 100·101/2 = 5050. Since 5050 ends in 50, it is divisible by 2 but not by 4 or 8. The digit sum is 10, so it is not divisible by 9.",
+        trap: "A large even number is not automatically divisible by 4 or 8."
+      },
+      {
+        id: 34,
+        topic: "Geometry",
+        difficulty: 2,
+        stem: "In an isosceles right triangle, what is the ratio of perpendicular : base : hypotenuse?",
+        options: ["1 : 1 : √2", "1 : 2 : 2", "1 : 3 : 1", "1 : 1 : 2"],
+        answer: 0,
+        hint: "In a 45°-45°-90° triangle, the legs are equal.",
+        fastPath: "Let each leg be 1. Then the hypotenuse is √2. So the ratio is 1 : 1 : √2.",
+        explanation: "An isosceles right triangle has two equal legs and one right angle. By Pythagoras, if each leg is 1, the hypotenuse is √2. Therefore the ratio is 1 : 1 : √2.",
+        trap: "Do not confuse it with a 30°-60°-90° triangle."
+      },
+      {
+        id: 35,
+        topic: "Geometry",
+        difficulty: 3,
+        stem: "A rectangle has area 120 m² and perimeter 46 m. What is the length of its diagonal?",
+        options: ["11 m", "13 m", "15 m", "17 m"],
+        answer: 3,
+        hint: "Find the side lengths from l + b and lb.",
+        fastPath: "l + b = 23 and lb = 120. The pair is 15 and 8. The diagonal is √(15² + 8²) = √289 = 17.",
+        explanation: "Perimeter 46 gives l + b = 23. The area gives lb = 120. The numbers 15 and 8 satisfy both. Then the diagonal is found by Pythagoras: √(15² + 8²) = √289 = 17 m.",
+        trap: "Do not try to use area directly in the diagonal formula. You need the side lengths first."
+      },
+      {
+        id: 36,
+        topic: "Geometry",
+        difficulty: 3,
+        stem: "A square playground has side length 150 m. Inside it there is a path 3.5 m wide running all around the border. What is the area of the path?",
+        options: ["2051 m²", "2081 m²", "2100 m²", "2161 m²"],
+        answer: 0,
+        hint: "Subtract the inner square area from the outer square area.",
+        fastPath: "Inner side = 150 − 2×3.5 = 143. Path area = 150² − 143² = 2051.",
+        explanation: "The border path eats 3.5 m from each side, so the inner square side becomes 143 m. The path area is outer area minus inner area: 150² − 143² = 22500 − 20449 = 2051 m².",
+        trap: "Do not subtract only one strip. The path runs around all four edges."
+      },
+      {
+        id: 37,
+        topic: "Geometry",
+        difficulty: 3,
+        stem: "ABCD is an isosceles trapezium with parallel sides 7 cm and 11 cm, and area 54 cm². What is the length of each non-parallel side?",
+        options: ["√10 cm", "2√10 cm", "5 cm", "√29 cm"],
+        answer: 1,
+        hint: "First find the height from the area formula.",
+        fastPath: "Area = (7 + 11)/2 × h = 54, so h = 6. The base difference is 4, so each side shifts 2 horizontally. Leg = √(6² + 2²) = √40 = 2√10.",
+        explanation: "Use trapezium area: ((7 + 11)/2)h = 54. So 9h = 54 and h = 6. Because the trapezium is isosceles, the 4 cm base difference splits equally, giving a 2 cm offset on each side. Each slanted side is √(6² + 2²) = 2√10 cm.",
+        trap: "The full base difference is 4, but each side only uses half of that in the right triangle."
+      },
+      {
+        id: 38,
+        topic: "Geometry",
+        difficulty: 2,
+        stem: "A square has side length 2 m. A circle is inscribed inside it. What is the area of the circle?",
+        options: ["π m²", "2π m²", "4π m²", "10π m²"],
+        answer: 0,
+        hint: "The diameter of the inscribed circle equals the side of the square.",
+        fastPath: "Diameter = 2, so radius = 1. Area = πr² = π.",
+        explanation: "An inscribed circle in a square touches all four sides, so its diameter equals the square's side length. Here the diameter is 2 m, so the radius is 1 m. Thus the circle's area is π m².",
+        trap: "Do not use radius 2. The side length is the diameter, not the radius."
+      },
+      {
+        id: 39,
+        topic: "Geometry",
+        difficulty: 2,
+        stem: "A right circular cone has height 8 m and slant height 10 m. What is its curved surface area?",
+        options: ["30π m²", "40π m²", "60π m²", "80π m²"],
+        answer: 2,
+        hint: "Find the radius from r² + h² = l², then use πrl.",
+        fastPath: "r = √(10² − 8²) = 6. Curved surface area = πrl = π×6×10 = 60π.",
+        explanation: "With height 8 m and slant height 10 m, the radius is √(100 − 64) = 6 m. The curved surface area of a cone is πrl, so the answer is π×6×10 = 60π m².",
+        trap: "Do not use πr². That is the base area, not the curved surface area."
+      },
+      {
+        id: 40,
+        topic: "Coordinate Geometry",
+        difficulty: 1,
+        stem: "In which quadrant does the point (-8, 4) lie?",
+        options: ["1st quadrant", "2nd quadrant", "3rd quadrant", "4th quadrant"],
+        answer: 1,
+        hint: "Check the signs of x and y.",
+        fastPath: "Negative x and positive y means the 2nd quadrant.",
+        explanation: "Quadrant II contains points with x negative and y positive. Since (-8, 4) has exactly that sign pattern, it lies in the 2nd quadrant.",
+        trap: "Do not focus on the magnitudes. Only the signs matter."
+      },
+      {
+        id: 41,
+        topic: "Logarithms",
+        difficulty: 1,
+        stem: "What is log111(111)?",
+        options: ["0", "1", "11", "111"],
+        answer: 1,
+        hint: "Any log base a of a is 1.",
+        fastPath: "Because 111¹ = 111, the value is 1.",
+        explanation: "By definition, log base a of a equals 1, since a raised to the power 1 gives a.",
+        trap: "Do not confuse the answer with the base or the argument."
+      },
+      {
+        id: 42,
+        topic: "Percentages",
+        difficulty: 2,
+        stem: "The price of a TV drops by 30%, but sales volume rises by 20%. What happens to the shopkeeper's total revenue from this TV?",
+        options: ["10% increase", "10% decrease", "16% increase", "16% decrease"],
+        answer: 3,
+        hint: "Revenue changes by multiplying the two factors.",
+        fastPath: "New revenue factor = 0.70 × 1.20 = 0.84. So revenue falls by 16%.",
+        explanation: "A 30% price drop means multiplying by 0.70. A 20% sales increase means multiplying by 1.20. The combined effect is 0.84, which means the revenue becomes 84% of the original, so it decreases by 16%.",
+        trap: "Never add percentage changes directly when they apply to different quantities."
+      },
+      {
+        id: 43,
+        topic: "Number Sense",
+        difficulty: 2,
+        stem: "If n and p are both odd numbers, which of the following must be even?",
+        options: ["n + p", "n + p + 1", "np", "np + 2"],
+        answer: 0,
+        hint: "Odd + odd is even.",
+        fastPath: "Odd + odd = even. The others stay odd.",
+        explanation: "If n and p are odd, then n + p is even. But n + p + 1 becomes odd. The product np is odd, and adding 2 keeps it odd. So only n + p is even.",
+        trap: "Adding 2 does not change odd to even. Odd + even stays odd."
+      }
+    ];
+
+    const topicOrder = [
+      "Arithmetic", "Percentages", "Ratio", "Work-Time", "Time-Speed-Distance",
+      "Number Sense", "Algebra", "Quadratics", "Functions", "Sets",
+      "Geometry", "Coordinate Geometry", "Trigonometry", "Logarithms",
+      "Radicals", "Counting", "Complex Numbers"
+    ];
+
+    const navItems = [
+      { id: "dashboard", label: "Dashboard" },
+      { id: "practice", label: "Practice Suites" },
+      { id: "weak", label: "Weak Areas" },
+      { id: "cheat", label: "Cheat Sheet" }
+    ];
+
+    const STORAGE_KEY = "math_trainer_progress_v1";
+
+    const defaultProgress = () => ({
+      attempted: 0,
+      correct: 0,
+      sessions: 0,
+      totalTime: 0,
+      byTopic: {},
+      missed: {},
+      bookmarks: [],
+      history: []
+    });
+
+    let progress = loadProgress();
+
+    const state = {
+      currentView: "dashboard",
+      currentSession: null,
+      currentSelectedOption: null,
+      feedbackShown: false,
+      timerId: null,
+      questionStartAt: null
+    };
+
+    function loadProgress() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : defaultProgress();
+      } catch {
+        return defaultProgress();
+      }
+    }
+
+    function saveProgress() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    }
+
+    function ensureTopic(topic) {
+      if (!progress.byTopic[topic]) {
+        progress.byTopic[topic] = { attempted: 0, correct: 0, totalTime: 0 };
+      }
+    }
+
+    function shuffle(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function clampCount(requested, available) {
+      return Math.max(1, Math.min(requested, available));
+    }
+
+    function selectQuestions({ topic = "All", count = 10, minDifficulty = 1, maxDifficulty = 5, mode = "practice" }) {
+      let pool = questionBank.filter(q => q.difficulty >= minDifficulty && q.difficulty <= maxDifficulty);
+      if (topic !== "All") pool = pool.filter(q => q.topic === topic);
+
+      if (mode === "weak") {
+        const weakIds = Object.entries(progress.missed)
+          .sort((a, b) => b[1] - a[1])
+          .map(([id]) => Number(id));
+        pool = weakIds.map(id => questionBank.find(q => q.id === id)).filter(Boolean);
+        if (!pool.length) {
+          pool = questionBank.filter(q => q.difficulty <= 3);
+        }
+      }
+
+      if (!pool.length) pool = [...questionBank];
+      return shuffle(pool).slice(0, clampCount(count, pool.length));
+    }
+
+    function buildNav() {
+      const nav = document.getElementById("nav");
+      nav.innerHTML = navItems.map(item => `
+        <button class="${state.currentView === item.id ? "active" : ""}" data-view="${item.id}">${item.label}</button>
+      `).join("");
+      nav.querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("click", () => showView(btn.dataset.view));
+      });
+    }
+
+    function showView(view) {
+      state.currentView = view;
+      buildNav();
+      document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+      if (view === 'dashboard') {
+        renderDashboard();
+        document.getElementById('dashboardView').classList.remove('hidden');
+      } else if (view === 'practice') {
+        renderPractice();
+        document.getElementById('practiceView').classList.remove('hidden');
+      } else if (view === 'weak') {
+        renderWeakAreas();
+        document.getElementById('weakView').classList.remove('hidden');
+      } else if (view === 'cheat') {
+        renderCheatSheet();
+        document.getElementById('cheatView').classList.remove('hidden');
+      }
+    }
+
+    function getAccuracy(correct, attempted) {
+      if (!attempted) return 0;
+      return Math.round((correct / attempted) * 100);
+    }
+
+    function formatTime(totalSeconds) {
+      const sec = Math.max(0, Math.floor(totalSeconds));
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${m}:${String(s).padStart(2, '0')}`;
+    }
+
+    function getMentorRecommendation() {
+      const topicStats = Object.entries(progress.byTopic)
+        .map(([topic, stats]) => ({ topic, ...stats, accuracy: getAccuracy(stats.correct, stats.attempted) }))
+        .filter(item => item.attempted > 0)
+        .sort((a, b) => a.accuracy - b.accuracy);
+
+      if (!topicStats.length) {
+        return "Start with Topic Drill on Arithmetic or Algebra. Build rhythm first, then move to timed tests.";
+      }
+
+      const weakest = topicStats[0];
+      if (weakest.accuracy < 55) {
+        return `Your weakest area right now is ${weakest.topic}. Do a 10-question drill there, then immediately follow with a 5-minute Speed Sprint.`;
+      }
+      if (weakest.accuracy < 75) {
+        return `You are close to stable in ${weakest.topic}, but not sharp yet. Use Weak Area Recovery and focus on the fast method after each miss.`;
+      }
+      return "Your accuracy is becoming stable. Shift more of your practice into Mini Mock and Full Mock mode to build exam stamina.";
+    }
+
+    function renderDashboard() {
+      const el = document.getElementById('dashboardView');
+      const accuracy = getAccuracy(progress.correct, progress.attempted);
+      const avgTime = progress.attempted ? Math.round(progress.totalTime / progress.attempted) : 0;
+      const topicBars = topicOrder
+        .filter(topic => progress.byTopic[topic])
+        .map(topic => {
+          const stats = progress.byTopic[topic];
+          const acc = getAccuracy(stats.correct, stats.attempted);
+          return `
+            <div class="topic-row">
+              <div><strong>${topic}</strong><div class="muted">${stats.correct}/${stats.attempted} correct</div></div>
+              <div class="bar-shell"><div class="bar-fill" style="width:${acc}%"></div></div>
+              <div><strong>${acc}%</strong></div>
+            </div>
+          `;
+        }).join('');
+
+      el.innerHTML = `
+        <div class="grid">
+          <div class="card">
+            <h2>Progress Dashboard</h2>
+            <p class="muted">This dashboard tracks mastery, speed, and weak areas. The goal is not just solving correctly. The goal is solving correctly with calm speed and the shortest clean method.</p>
+            <div class="stats">
+              <div class="stat"><div class="label">Questions Solved</div><div class="value">${progress.attempted}</div></div>
+              <div class="stat"><div class="label">Overall Accuracy</div><div class="value">${accuracy}%</div></div>
+              <div class="stat"><div class="label">Average Time</div><div class="value">${avgTime || 0}s</div></div>
+              <div class="stat"><div class="label">Sessions</div><div class="value">${progress.sessions}</div></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Mentor Suggestion</h2>
+            <div class="tip">
+              <strong>Next best move</strong>
+              <div class="muted">${getMentorRecommendation()}</div>
+            </div>
+            <div class="tip">
+              <strong>How to use this site properly</strong>
+              <div class="muted">Do Topic Drill until patterns feel familiar. Then use Speed Sprint to reduce hesitation. Finish with Mini Mock or Full Mock to build exam control.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Study Suites</h2>
+            <div class="suite-list">
+              <div class="suite">
+                <strong>Topic Drill</strong>
+                <p>Hammer one concept repeatedly until it becomes automatic.</p>
+                <button class="button primary" data-launch="topic">Start Topic Drill</button>
+              </div>
+              <div class="suite">
+                <strong>Mixed Drill</strong>
+                <p>Mix topics to train recognition, not memorization.</p>
+                <button class="button secondary" data-launch="mixed">Start Mixed Drill</button>
+              </div>
+              <div class="suite">
+                <strong>Speed Sprint</strong>
+                <p>5-minute pressure set for fast thinking without panic.</p>
+                <button class="button warning" data-launch="sprint">Start Speed Sprint</button>
+              </div>
+              <div class="suite">
+                <strong>Mini Mock</strong>
+                <p>10 questions with no answer reveal until the end.</p>
+                <button class="button success" data-launch="mini">Start Mini Mock</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Accuracy by Topic</h2>
+            ${topicBars ? `<div class="topic-bars">${topicBars}</div>` : `<div class="empty-state">No topic data yet. Start a practice suite and your weak and strong areas will appear here.</div>`}
+          </div>
+        </div>
+      `;
+
+      el.querySelectorAll('[data-launch]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          showView('practice');
+          if (btn.dataset.launch === 'topic') {
+            document.getElementById('suiteSelect').value = 'topic';
+          } else if (btn.dataset.launch === 'mixed') {
+            document.getElementById('suiteSelect').value = 'mixed';
+            document.getElementById('topicSelect').value = 'All';
+          } else if (btn.dataset.launch === 'sprint') {
+            startSpeedSprint();
+          } else if (btn.dataset.launch === 'mini') {
+            startMock(10);
+          }
+        });
+      });
+    }
+
+    function topicOptionsHtml(selected = 'All') {
+      const topics = ['All', ...topicOrder.filter(topic => questionBank.some(q => q.topic === topic))];
+      return topics.map(topic => `<option value="${topic}" ${selected === topic ? 'selected' : ''}>${topic}</option>`).join('');
+    }
+
+    function renderPractice() {
+      const el = document.getElementById('practiceView');
+      el.innerHTML = `
+        <div class="grid grid-2">
+          <div class="card">
+            <h2>Build a Practice Session</h2>
+            <p class="muted">Choose a suite. The site will give explanations, shortcuts, and mistake analysis after each question in practice mode.</p>
+            <div class="form-grid">
+              <div>
+                <label for="suiteSelect">Suite</label>
+                <select id="suiteSelect">
+                  <option value="topic">Topic Drill</option>
+                  <option value="mixed">Mixed Drill</option>
+                  <option value="mock10">Mini Mock (10 questions)</option>
+                  <option value="mock25">Full Mock (25 questions)</option>
+                  <option value="weak">Weak Area Recovery</option>
+                </select>
+              </div>
+              <div>
+                <label for="topicSelect">Topic</label>
+                <select id="topicSelect">${topicOptionsHtml()}</select>
+              </div>
+              <div>
+                <label for="difficultySelect">Difficulty Band</label>
+                <select id="difficultySelect">
+                  <option value="1-2">Level 1-2: basic pattern building</option>
+                  <option value="1-3" selected>Level 1-3: exam-friendly core</option>
+                  <option value="2-4">Level 2-4: standard challenge</option>
+                  <option value="3-5">Level 3-5: hard set</option>
+                </select>
+              </div>
+              <div>
+                <label for="countSelect">Question Count</label>
+                <select id="countSelect">
+                  <option value="5">5</option>
+                  <option value="10" selected>10</option>
+                  <option value="15">15</option>
+                </select>
+              </div>
+            </div>
+            <div class="checkbox-row">
+              <input type="checkbox" id="instantFeedback" checked />
+              <label for="instantFeedback" style="margin:0;">Show explanation after each answer in practice mode</label>
+            </div>
+            <div class="session-actions">
+              <button class="button primary" id="startSuiteBtn">Start Selected Suite</button>
+              <button class="button secondary" id="startSprintBtn">Start 5-Minute Speed Sprint</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Suite Guide</h2>
+            <div class="tips">
+              <div class="tip">
+                <strong>Topic Drill</strong>
+                <div class="muted">Best for understanding the pattern behind one type of question and learning the shortest clean method.</div>
+              </div>
+              <div class="tip">
+                <strong>Mixed Drill</strong>
+                <div class="muted">Best for improving recognition. Real exams rarely tell you what technique to use.</div>
+              </div>
+              <div class="tip">
+                <strong>Mini Mock / Full Mock</strong>
+                <div class="muted">Best for stamina, timing, and emotional control. No answer reveal until the end.</div>
+              </div>
+              <div class="tip">
+                <strong>Weak Area Recovery</strong>
+                <div class="muted">Best when the same traps keep catching the student. Repetition fixes that.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const suiteSelect = document.getElementById('suiteSelect');
+      const topicSelect = document.getElementById('topicSelect');
+      const countSelect = document.getElementById('countSelect');
+      const instantFeedback = document.getElementById('instantFeedback');
+
+      suiteSelect.addEventListener('change', () => {
+        const suite = suiteSelect.value;
+        if (suite === 'mock10' || suite === 'mock25' || suite === 'weak') {
+          instantFeedback.checked = false;
+        }
+        if (suite === 'weak') {
+          topicSelect.value = 'All';
+        }
+      });
+
+      document.getElementById('startSuiteBtn').addEventListener('click', () => {
+        const [minDifficulty, maxDifficulty] = document.getElementById('difficultySelect').value.split('-').map(Number);
+        const suite = suiteSelect.value;
+        const topic = topicSelect.value;
+        const count = Number(countSelect.value);
+        const showInstant = instantFeedback.checked;
+
+        if (suite === 'topic') {
+          const questions = selectQuestions({ topic: topic === 'All' ? 'Arithmetic' : topic, count, minDifficulty, maxDifficulty, mode: 'practice' });
+          startSession({
+            modeLabel: `Topic Drill • ${topic === 'All' ? 'Arithmetic' : topic}`,
+            questions,
+            timerSeconds: null,
+            showInstantFeedback: showInstant,
+            suiteType: 'practice'
+          });
+        } else if (suite === 'mixed') {
+          const questions = selectQuestions({ topic: 'All', count, minDifficulty, maxDifficulty, mode: 'practice' });
+          startSession({
+            modeLabel: 'Mixed Drill',
+            questions,
+            timerSeconds: null,
+            showInstantFeedback: showInstant,
+            suiteType: 'practice'
+          });
+        } else if (suite === 'mock10') {
+          startMock(10);
+        } else if (suite === 'mock25') {
+          startMock(25);
+        } else if (suite === 'weak') {
+          const questions = selectQuestions({ count, mode: 'weak' });
+          startSession({
+            modeLabel: 'Weak Area Recovery',
+            questions,
+            timerSeconds: null,
+            showInstantFeedback: true,
+            suiteType: 'practice'
+          });
+        }
+      });
+
+      document.getElementById('startSprintBtn').addEventListener('click', startSpeedSprint);
+    }
+
+    function startMock(count) {
+      const questions = selectQuestions({ topic: 'All', count, minDifficulty: 1, maxDifficulty: 4, mode: 'practice' });
+      startSession({
+        modeLabel: count === 10 ? 'Mini Mock' : 'Full Mock',
+        questions,
+        timerSeconds: count === 10 ? 9 * 60 : 22 * 60,
+        showInstantFeedback: false,
+        suiteType: 'mock'
+      });
+    }
+
+    function startSpeedSprint() {
+      const questions = selectQuestions({ topic: 'All', count: 20, minDifficulty: 1, maxDifficulty: 3, mode: 'practice' });
+      startSession({
+        modeLabel: '5-Minute Speed Sprint',
+        questions,
+        timerSeconds: 5 * 60,
+        showInstantFeedback: true,
+        suiteType: 'sprint'
+      });
+    }
+
+    function startSession({ modeLabel, questions, timerSeconds, showInstantFeedback, suiteType }) {
+      clearInterval(state.timerId);
+      state.currentSession = {
+        modeLabel,
+        suiteType,
+        questions,
+        timerSeconds,
+        startedAt: Date.now(),
+        remainingSeconds: timerSeconds,
+        currentIndex: 0,
+        answers: [],
+        showInstantFeedback,
+        finished: false
+      };
+      state.currentSelectedOption = null;
+      state.feedbackShown = false;
+      state.questionStartAt = Date.now();
+
+      document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+      document.getElementById('sessionView').classList.remove('hidden');
+      renderSession();
+      if (timerSeconds) startTimer();
+    }
+
+    function startTimer() {
+      clearInterval(state.timerId);
+      state.timerId = setInterval(() => {
+        const session = state.currentSession;
+        if (!session || session.finished || session.timerSeconds == null) return;
+        session.remainingSeconds -= 1;
+        if (session.remainingSeconds <= 0) {
+          session.remainingSeconds = 0;
+          renderSession();
+          endSession('Time is up.');
+          return;
+        }
+        renderSessionHeaderOnly();
+      }, 1000);
+    }
+
+    function renderSessionHeaderOnly() {
+      const session = state.currentSession;
+      if (!session) return;
+      const timerEl = document.getElementById('timerValue');
+      const progressBar = document.getElementById('progressBar');
+      const progressText = document.getElementById('progressText');
+      if (timerEl) timerEl.textContent = session.timerSeconds == null ? 'Untimed' : formatTime(session.remainingSeconds);
+      if (progressBar) progressBar.style.width = `${((session.currentIndex) / session.questions.length) * 100}%`;
+      if (progressText) progressText.textContent = `Question ${Math.min(session.currentIndex + 1, session.questions.length)} of ${session.questions.length}`;
+    }
+
+    function renderSession() {
+      const el = document.getElementById('sessionView');
+      const session = state.currentSession;
+      const q = session.questions[session.currentIndex];
+      const answerRecord = session.answers[session.currentIndex];
+      const isAnswered = typeof answerRecord?.selected === 'number';
+      const isFeedback = state.feedbackShown || (!session.showInstantFeedback && isAnswered);
+
+      const optionHtml = q.options.map((option, index) => {
+        let classes = 'option';
+        if (state.currentSelectedOption === index) classes += ' selected';
+        if (isFeedback) {
+          if (index === q.answer) classes += ' correct';
+          if (answerRecord?.selected === index && index !== q.answer) classes += ' wrong';
+        }
+        return `
+          <div class="${classes}" data-option-index="${index}">
+            <div class="option-letter">${String.fromCharCode(65 + index)}</div>
+            <div>${option}</div>
+          </div>
+        `;
+      }).join('');
+
+      const banner = isFeedback
+        ? (answerRecord?.correct
+          ? `<div class="result-banner success">Correct. Good. Now lock in the pattern, not just the answer.</div>`
+          : `<div class="result-banner warning">Not quite. Focus on the pattern and the shortcut below. This is exactly how weak areas become strong.</div>`)
+        : '';
+
+      const mentorBox = isFeedback ? `
+        <div class="mentor-box">
+          <div class="mentor-title">Mentor Feedback</div>
+          <ul class="mentor-list">
+            <li><strong>Fastest path:</strong> ${q.fastPath}</li>
+            <li><strong>Full explanation:</strong> ${q.explanation}</li>
+            <li><strong>Trap to avoid:</strong> ${q.trap}</li>
+          </ul>
+        </div>
+      ` : '';
+
+      el.innerHTML = `
+        <div class="card">
+          <div class="session-top">
+            <div class="mode-badge">${session.modeLabel}</div>
+            <div>
+              <div class="muted" id="progressText">Question ${session.currentIndex + 1} of ${session.questions.length}</div>
+              <div class="timer" id="timerValue">${session.timerSeconds == null ? 'Untimed' : formatTime(session.remainingSeconds)}</div>
+            </div>
+          </div>
+          <div class="progress-shell"><div class="progress-bar" id="progressBar" style="width:${(session.currentIndex / session.questions.length) * 100}%"></div></div>
+
+          <div class="question-meta">
+            <div class="meta-chip">Topic: ${q.topic}</div>
+            <div class="meta-chip">Difficulty: ${q.difficulty}/5</div>
+            <div class="meta-chip">No Calculator</div>
+          </div>
+
+          <div class="question-stem">${q.stem}</div>
+          ${banner}
+          <div class="options">${optionHtml}</div>
+
+          <div class="session-actions">
+            <button class="button secondary" id="hintBtn">Show Hint</button>
+            <button class="button ghost" id="bookmarkBtn">Bookmark</button>
+            ${!isFeedback ? `<button class="button primary" id="submitAnswerBtn">Submit Answer</button>` : `<button class="button success" id="nextQuestionBtn">${session.currentIndex === session.questions.length - 1 ? 'Finish Session' : 'Next Question'}</button>`}
+            <button class="button secondary" id="exitSessionBtn">End Session</button>
+          </div>
+
+          <div id="hintBox" class="mentor-box hidden">
+            <div class="mentor-title">Hint</div>
+            <div class="muted">${q.hint}</div>
+          </div>
+
+          ${mentorBox}
+        </div>
+      `;
+
+      el.querySelectorAll('[data-option-index]').forEach(option => {
+        option.addEventListener('click', () => {
+          if (isFeedback) return;
+          state.currentSelectedOption = Number(option.dataset.optionIndex);
+          renderSession();
+        });
+      });
+
+      document.getElementById('hintBtn').addEventListener('click', () => {
+        document.getElementById('hintBox').classList.remove('hidden');
+      });
+
+      document.getElementById('bookmarkBtn').addEventListener('click', () => {
+        toggleBookmark(q.id);
+      });
+
+      document.getElementById('exitSessionBtn').addEventListener('click', () => endSession('Session ended early.'));
+
+      if (!isFeedback) {
+        document.getElementById('submitAnswerBtn').addEventListener('click', submitCurrentAnswer);
+      } else {
+        document.getElementById('nextQuestionBtn').addEventListener('click', moveNext);
+      }
+    }
+
+    function toggleBookmark(questionId) {
+      const set = new Set(progress.bookmarks || []);
+      if (set.has(questionId)) set.delete(questionId); else set.add(questionId);
+      progress.bookmarks = [...set];
+      saveProgress();
+      alert(set.has(questionId) ? 'Question bookmarked.' : 'Bookmark removed.');
+    }
+
+    function submitCurrentAnswer() {
+      const session = state.currentSession;
+      const q = session.questions[session.currentIndex];
+      if (state.currentSelectedOption == null) {
+        alert('Pick an option first.');
+        return;
+      }
+      const timeTaken = Math.round((Date.now() - state.questionStartAt) / 1000);
+      const correct = state.currentSelectedOption === q.answer;
+
+      session.answers[session.currentIndex] = {
+        questionId: q.id,
+        topic: q.topic,
+        selected: state.currentSelectedOption,
+        correct,
+        timeTaken
+      };
+
+      if (session.showInstantFeedback) {
+        state.feedbackShown = true;
+        renderSession();
+      } else {
+        moveNext();
+      }
+    }
+
+    function moveNext() {
+      const session = state.currentSession;
+      if (session.currentIndex >= session.questions.length - 1) {
+        endSession();
+        return;
+      }
+      session.currentIndex += 1;
+      state.currentSelectedOption = null;
+      state.feedbackShown = false;
+      state.questionStartAt = Date.now();
+      renderSession();
+    }
+
+    function updateProgressFromSession(session) {
+      const answered = session.answers.filter(Boolean);
+      answered.forEach(answer => {
+        const q = questionBank.find(item => item.id === answer.questionId);
+        ensureTopic(answer.topic);
+        progress.attempted += 1;
+        progress.totalTime += answer.timeTaken;
+        progress.byTopic[answer.topic].attempted += 1;
+        progress.byTopic[answer.topic].totalTime += answer.timeTaken;
+        if (answer.correct) {
+          progress.correct += 1;
+          progress.byTopic[answer.topic].correct += 1;
+        } else {
+          progress.missed[answer.questionId] = (progress.missed[answer.questionId] || 0) + 1;
+        }
+      });
+      progress.sessions += 1;
+      progress.history.unshift({
+        when: new Date().toISOString(),
+        suite: session.modeLabel,
+        score: answered.filter(a => a.correct).length,
+        total: answered.length,
+        secondsSpent: Math.round((Date.now() - session.startedAt) / 1000)
+      });
+      progress.history = progress.history.slice(0, 12);
+      saveProgress();
+    }
+
+    function endSession(reason = '') {
+      clearInterval(state.timerId);
+      const session = state.currentSession;
+      if (!session || session.finished) return;
+      session.finished = true;
+      updateProgressFromSession(session);
+      renderResults(reason);
+      document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+      document.getElementById('resultsView').classList.remove('hidden');
+    }
+
+    function buildResultRecommendations(answers) {
+      const wrong = answers.filter(a => !a.correct);
+      if (!wrong.length) {
+        return [
+          'Excellent. Do a Speed Sprint next so accuracy stays high under pressure.',
+          'Now shift attention from correctness to speed. Aim to cut average time without losing control.'
+        ];
+      }
+      const countByTopic = {};
+      wrong.forEach(item => countByTopic[item.topic] = (countByTopic[item.topic] || 0) + 1);
+      const sorted = Object.entries(countByTopic).sort((a, b) => b[1] - a[1]);
+      const top = sorted[0]?.[0];
+      const next = sorted[1]?.[0];
+      const tips = [];
+      if (top) tips.push(`Your biggest leak in this session was ${top}. Do a focused 5-question drill there before taking another mock.`);
+      if (next) tips.push(`Your second weak area was ${next}. Review the trap notes from those questions, not just the final answers.`);
+      tips.push('When you miss a question, ask yourself which pattern you failed to identify early enough. That is the real skill gap.');
+      return tips;
+    }
+
+    function renderResults(reason = '') {
+      const el = document.getElementById('resultsView');
+      const session = state.currentSession;
+      const answers = session.answers.filter(Boolean);
+      const correct = answers.filter(a => a.correct).length;
+      const accuracy = getAccuracy(correct, answers.length);
+      const totalSpent = Math.round((Date.now() - session.startedAt) / 1000);
+      const avgTime = answers.length ? Math.round(answers.reduce((sum, a) => sum + a.timeTaken, 0) / answers.length) : 0;
+      const review = answers.map(answer => {
+        const q = questionBank.find(item => item.id === answer.questionId);
+        return `
+          <div class="review-item ${answer.correct ? 'good' : 'bad'}">
+            <strong>${answer.correct ? 'Correct' : 'Needs Work'} • ${q.topic}</strong>
+            <div class="muted" style="margin-bottom:10px;">${q.stem}</div>
+            <div><strong>Your answer:</strong> ${q.options[answer.selected]}</div>
+            <div><strong>Correct answer:</strong> ${q.options[q.answer]}</div>
+            <div style="margin-top:10px;"><strong>Fastest path:</strong> ${q.fastPath}</div>
+            <div style="margin-top:10px;"><strong>Trap:</strong> ${q.trap}</div>
+          </div>
+        `;
+      }).join('');
+
+      const history = progress.history.map(item => `
+        <div class="tip">
+          <strong>${item.suite}</strong>
+          <div class="muted">Score: ${item.score}/${item.total} • Time: ${formatTime(item.secondsSpent)}</div>
+        </div>
+      `).join('');
+
+      el.innerHTML = `
+        <div class="grid grid-2">
+          <div class="card">
+            <h2>Session Results</h2>
+            ${reason ? `<div class="result-banner warning">${reason}</div>` : ''}
+            <div class="stats">
+              <div class="stat"><div class="label">Score</div><div class="value">${correct}/${answers.length}</div></div>
+              <div class="stat"><div class="label">Accuracy</div><div class="value">${accuracy}%</div></div>
+              <div class="stat"><div class="label">Time Used</div><div class="value">${formatTime(totalSpent)}</div></div>
+              <div class="stat"><div class="label">Avg / Question</div><div class="value">${avgTime}s</div></div>
+            </div>
+            <div class="mentor-box" style="margin-top:18px;">
+              <div class="mentor-title">What to do next</div>
+              <ul class="mentor-list">
+                ${buildResultRecommendations(answers).map(item => `<li>${item}</li>`).join('')}
+              </ul>
+            </div>
+            <div class="session-actions">
+              <button class="button primary" id="retryWrongBtn">Retry Wrong Questions</button>
+              <button class="button secondary" id="goPracticeBtn">Back to Practice</button>
+              <button class="button success" id="goDashboardBtn">Dashboard</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Recent Sessions</h2>
+            <div class="tips">
+              ${history || '<div class="empty-state">No recent sessions yet.</div>'}
+            </div>
+          </div>
+
+          <div class="card" style="grid-column: 1 / -1;">
+            <h2>Question Review</h2>
+            <div class="review-list">${review}</div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('retryWrongBtn').addEventListener('click', () => {
+        const wrongIds = answers.filter(a => !a.correct).map(a => a.questionId);
+        const wrongQuestions = wrongIds.map(id => questionBank.find(q => q.id === id)).filter(Boolean);
+        if (!wrongQuestions.length) {
+          alert('There are no wrong questions to retry in this session.');
+          return;
+        }
+        startSession({
+          modeLabel: 'Retry Wrong Questions',
+          questions: shuffle(wrongQuestions),
+          timerSeconds: null,
+          showInstantFeedback: true,
+          suiteType: 'practice'
+        });
+      });
+      document.getElementById('goPracticeBtn').addEventListener('click', () => showView('practice'));
+      document.getElementById('goDashboardBtn').addEventListener('click', () => showView('dashboard'));
+    }
+
+    function renderWeakAreas() {
+      const el = document.getElementById('weakView');
+      const misses = Object.entries(progress.missed)
+        .map(([id, count]) => ({ question: questionBank.find(q => q.id === Number(id)), count }))
+        .filter(item => item.question)
+        .sort((a, b) => b.count - a.count);
+
+      const groupedTopics = {};
+      misses.forEach(item => {
+        groupedTopics[item.question.topic] = (groupedTopics[item.question.topic] || 0) + item.count;
+      });
+
+      const topicRows = Object.entries(groupedTopics)
+        .sort((a, b) => b[1] - a[1])
+        .map(([topic, count]) => `
+          <div class="tip">
+            <strong>${topic}</strong>
+            <div class="muted">Missed ${count} time(s). This topic needs repetition until the pattern becomes automatic.</div>
+          </div>
+        `).join('');
+
+      const questionRows = misses.slice(0, 12).map(item => `
+        <div class="review-item bad">
+          <strong>${item.question.topic} • Missed ${item.count} time(s)</strong>
+          <div class="muted">${item.question.stem}</div>
+          <div style="margin-top:10px;"><strong>Fix:</strong> ${item.question.fastPath}</div>
+        </div>
+      `).join('');
+
+      el.innerHTML = `
+        <div class="grid grid-2">
+          <div class="card">
+            <h2>Weak Area Recovery</h2>
+            <p class="muted">These are the topics and questions that have hurt performance most often. Train these deliberately, not emotionally.</p>
+            ${topicRows || '<div class="empty-state">No weak areas yet. Once a few mistakes are logged, this page becomes your personal recovery plan.</div>'}
+            <div class="session-actions" style="margin-top:18px;">
+              <button class="button primary" id="weakRecoveryBtn">Start Recovery Session</button>
+              <button class="button secondary" id="bookmarksBtn">Practice Bookmarked Questions</button>
+            </div>
+          </div>
+          <div class="card">
+            <h2>Mentor Rule</h2>
+            <div class="tip">
+              <strong>How weak areas are fixed</strong>
+              <div class="muted">Do not jump randomly between topics. Pick the top weak topic, solve 5 to 10 questions, review every trap, then take a short mixed drill to test whether the improvement holds.</div>
+            </div>
+            <div class="tip">
+              <strong>What not to do</strong>
+              <div class="muted">Do not just reread the correct answer. Rebuild the solving path in your own head and say why the wrong option was tempting.</div>
+            </div>
+          </div>
+          <div class="card" style="grid-column: 1 / -1;">
+            <h2>Most Missed Questions</h2>
+            <div class="review-list">${questionRows || '<div class="empty-state">No repeated misses yet.</div>'}</div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('weakRecoveryBtn').addEventListener('click', () => {
+        const questions = selectQuestions({ count: 10, mode: 'weak' });
+        startSession({
+          modeLabel: 'Weak Area Recovery',
+          questions,
+          timerSeconds: null,
+          showInstantFeedback: true,
+          suiteType: 'practice'
+        });
+      });
+
+      document.getElementById('bookmarksBtn').addEventListener('click', () => {
+        const bookmarks = (progress.bookmarks || []).map(id => questionBank.find(q => q.id === id)).filter(Boolean);
+        if (!bookmarks.length) {
+          alert('There are no bookmarked questions yet.');
+          return;
+        }
+        startSession({
+          modeLabel: 'Bookmarked Questions',
+          questions: shuffle(bookmarks).slice(0, 12),
+          timerSeconds: null,
+          showInstantFeedback: true,
+          suiteType: 'practice'
+        });
+      });
+    }
+
+    function renderCheatSheet() {
+      const el = document.getElementById('cheatView');
+      el.innerHTML = `
+        <div class="grid grid-2">
+          <div class="card">
+            <h2>No-Calculator Cheat Sheet</h2>
+            <div class="tips">
+              <div class="tip">
+                <strong>Percent changes</strong>
+                <div class="muted">For repeated percentage effects, multiply factors. A 20% rise means ×1.20. A 30% drop means ×0.70.</div>
+              </div>
+              <div class="tip">
+                <strong>Area scaling</strong>
+                <div class="muted">If a length scales by k, area scales by k². Volume scales by k³.</div>
+              </div>
+              <div class="tip">
+                <strong>Ratios</strong>
+                <div class="muted">Turn every ratio into parts first. One part is the anchor to solve everything else.</div>
+              </div>
+              <div class="tip">
+                <strong>Work and time</strong>
+                <div class="muted">For the same job, workers × time stays constant.</div>
+              </div>
+              <div class="tip">
+                <strong>Trains moving toward each other</strong>
+                <div class="muted">Use relative speed = sum of speeds.</div>
+              </div>
+              <div class="tip">
+                <strong>Quadratic discriminant</strong>
+                <div class="muted">D > 0: two real unequal. D = 0: equal real. D < 0: no real roots.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Mental Method Reminders</h2>
+            <div class="tips">
+              <div class="tip">
+                <strong>Always classify the question first</strong>
+                <div class="muted">Before calculating, ask: percentage, ratio, Pythagoras, determinant, composition, log rule, or counting principle?</div>
+              </div>
+              <div class="tip">
+                <strong>Look for clean structure</strong>
+                <div class="muted">Exam setters often hide a simple pattern behind scary wording. Strip the words down to the math skeleton.</div>
+              </div>
+              <div class="tip">
+                <strong>Use units to stay sane</strong>
+                <div class="muted">In geometry and word problems, units stop careless mistakes.</div>
+              </div>
+              <div class="tip">
+                <strong>Estimate before solving</strong>
+                <div class="muted">A quick estimate helps eliminate impossible options and catches arithmetic slips.</div>
+              </div>
+              <div class="tip">
+                <strong>Review the trap, not just the answer</strong>
+                <div class="muted">The wrong option you nearly chose tells you more than the correct one.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer-note">This site stores progress locally in the browser so the student can keep drilling weak areas without setting up a backend.</div>
+      `;
+    }
+
+    function init() {
+      buildNav();
+      renderDashboard();
+      renderPractice();
+      renderWeakAreas();
+      renderCheatSheet();
+      showView('dashboard');
+    }
+
+    init();
+  </script>
+</body>
+</html>
